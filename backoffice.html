@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+
+    <title>Backoffice</title>
+
+    <style>
+        body {
+        color: white;
+        background-color: #37475A;
+        }
+
+        #button {
+            background-color: #FF9900;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Amazon Webshop</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+            <div class="navbar-nav">
+                <a class="nav-link active" href="file:///Users/roosavuotso/Desktop/Strive/M3D8/index.html">Home</a>
+                <a class="nav-link" href="file:///Users/roosavuotso/Desktop/Strive/M3D8/backoffice.html">Backoffice</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container form-container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h2 class="d-inline-block mt-5 mb-3">Backoffice</h2>
+                <h5 id="subtitle" class="d-inline-block"></h5>
+                
+                <span id="alert-box"></span>
+
+                <form onsubmit="handleSubmit(event)" id="product">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input id="name" type="text" class="form-control" aria-describedby="name field"
+                            placeholder="Insert a name for the product" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" type="text" rows="6" class="form-control"
+                            aria-describedby="event description field" placeholder="Write the product's description"
+                            required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="brand">Brand</label>
+                        <input id="brand" type="text" class="form-control"
+                        aria-describedby="product brand" placeholder="Write the product's brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Price</label>
+                        <input id="price" type="number" class="form-control" aria-describedby="ticket price field"
+                            placeholder="Write the product's price" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">Image</label>
+                        <input type="url" class="form-control" id="image" placeholder="Insert the image URL" required>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button id="button" type="submit" class="btn btn-secondary"
+                            onclick="this.form.classList.add('validated')"><span>Submit</span>
+                            <div id="spinner" class="spinner-border spinner-border-sm text-light d-none" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                            </button>
+                            <button id="delete-btn" type="submit" class="btn btn-danger d-none" onclick ="deleteProduct()"><span>Delete</span>>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path
+                                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                    <path fill-rule="evenodd"
+                                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                                </svg>
+                            </button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+
+    <script>
+
+const productId = new URLSearchParams(window.location.search).get("id")
+
+const endpoint = productId ? "https://striveschool-api.herokuapp.com/api/product/" + productId : "https://striveschool-api.herokuapp.com/api/product/"
+const method = productId ? "PUT" : "POST"
+
+
+window.onload = async () => {
+            console.log("Resource ID is: " + productId)
+
+            if (productId) {
+                document.getElementById("subtitle").innerText = " — Edit Product"
+                const submitBtn = document.querySelector("button[type=submit]")
+                const submitBtnText = document.querySelector("button[type=submit] span")
+
+                submitBtn.querySelector("span").innerText = "Edit Product"
+                submitBtn.classList.remove("btn-secondary")
+                submitBtn.classList.add("btn-success")
+
+
+                document.getElementById("delete-btn").classList.remove("d-none")
+
+                const response = await fetch(endpoint)
+                const productDetails = await response.json()
+
+                document.getElementById("name").value = productDetails.name
+                document.getElementById("description").value = productDetails.description
+                document.getElementById("price").value = productDetails.price
+                document.getElementById("time").value = productDetails.time.split(".")[0]
+
+
+            } else {
+                document.getElementById("subtitle").innerText = " — Create an Event"
+            }
+        }
+
+        const handleSubmit = async (product) => {
+            product.preventDefault()
+
+            isLoading(true)
+
+            const newProduct = {
+                name: document.getElementById("name").value,
+                description: document.getElementById("description").value,
+                price: document.getElementById("price").value,
+                time: document.getElementById("time").value
+            }
+
+            console.log(JSON.stringify(myProduct))
+            try {
+                const response = await fetch(endpoint, {
+                    method,
+                    body: JSON.stringify(newProduct),
+                    headers: {
+                        "Content-Type": "application/json",
+                    }
+                })
+                if (response.ok) {
+                    const respEvent = await response.json()
+                    if (productId) {
+                        showAlert("success", "Product with an id of: " + respEvent._id + " got edited successfully")
+                    } else {
+                        showAlert("success", "Product created successfully with an id of " + respEvent._id)
+                    }
+        }
+
+        const deleteProduct = async () => {
+            const confirmed = confirm("Are you sure you want to delete this product?")
+            if (confirmed) {
+                try {
+                    const response = await fetch(endpoint, { method: "DELETE" })
+                    if (response.ok) {
+                        showAlert("success", "Product deleted successfully")
+                        setTimeout(() => { window.location.assign("/") }, 4100)
+                    } else {
+                        showAlert("danger", "Something went wrong in the deletion process")
+                    }
+                } catch (err) {
+                    showAlert("danger", err.message)
+                }
+            }
+}
+
+        const showAlert = (type, msg) => {
+
+            const alertContainer = document.getElementById("alert-box")
+
+            alertContainer.innerHTML = `
+            <div class="alert alert-${type}" role="alert">
+            ${msg}
+            </div>
+            `
+
+            setTimeout(() => {
+                alertContainer.innerHTML = ""
+            }, 4000)
+        }
+
+        const isLoading = (boolean) => {
+            if (boolean) {
+                document.querySelector("#spinner").classList.remove("d-none")
+            } else {
+                document.querySelector("#spinner").classList.add("d-none")
+            }
+        }
+
+    
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+        crossorigin="anonymous"></script>
+
+
+</body>
+
+</html>
