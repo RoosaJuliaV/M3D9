@@ -117,45 +117,6 @@
             
     <script> 
 
-const eventId = new URLSearchParams(window.location.search).get("id")
-
-const endpoint = eventId ? "https://striveschool-api.herokuapp.com/api/product/" + eventId : "https://striveschool-api.herokuapp.com/api/product/"
-const method = eventId ? "PUT" : "POST"
-
-
-window.onload = async () => {
-            console.log("Resource ID is: " + eventId)
-
-            if (eventId) {
-                document.getElementById("subtitle").innerText = " — Edit Event"
-                const submitBtn = document.querySelector("button[type=submit]")
-                const submitBtnText = document.querySelector("button[type=submit] span")
-
-                submitBtn.querySelector("span").innerText = "Edit Event"
-                submitBtn.classList.remove("btn-danger")
-                submitBtn.classList.add("btn-success")
-
-                // submitBtn.className = "btn btn-success" // need to maintain every element that you need in the class later.
-
-                document.getElementById("delete-btn").classList.remove("d-none")
-
-                const response = await fetch(endpoint)
-                const eventDetails = await response.json()
-
-                document.getElementById("name").value = eventDetails.name
-                document.getElementById("description").value = eventDetails.description
-                document.getElementById("brand").value = eventDetails.brand
-                document.getElementById("price").value = eventDetails.price
-                document.getElementById("image").value = eventDetails.imageUrl
-
-
-
-
-            } else {
-                document.getElementById("subtitle").innerText = " — Create an Event"
-            }
-        }
-
         const getAllProducts = async () => {
             const url = "https://striveschool-api.herokuapp.com/api/product/"
             try {
@@ -196,6 +157,7 @@ window.onload = async () => {
                     <h6 class="card-text">Brand: ${product.brand}</h6>
                     <p class="card-text">Price: ${product.description}</p>
                     <p class="card-text">Price: ${product.price}</p>
+                    <a href="backoffice.html?id=${product._id}" class="btn btn-warning" id="edit">Edit</a>
                     <button id="delete-btn" type="submit" class="btn btn-danger d-none" onclick="deleteProduct()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white"
                                 class="bi bi-trash" viewBox="0 0 16 16">
